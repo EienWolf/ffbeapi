@@ -30,11 +30,22 @@ namespace ffbeApi
                 optionsBuilder.UseNpgsql(Configuration.GetConnectionString("FFBEConnection"));
             });
             services.AddMvc();
+            services.AddCors(options2 =>
+            {
+                options2.AddPolicy("AllowSpecificOrigin",
+                    builder => builder
+                        //.AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin()
+                        .AllowCredentials()
+                        .WithHeaders("accept", "content-type", "origin", "x-custom-header", "authorization"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseCors("AllowSpecificOrigin");
             loggerFactory.AddConsole(LogLevel.Trace);
             if (env.IsDevelopment())
             {
